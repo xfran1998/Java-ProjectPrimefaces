@@ -24,4 +24,4 @@ To see the change reflected we have to _Full Publish_ the project
 
 - (_Server window_)Right click on the project → Full publish
 
-Now the link of the server has change to: `` localhost:8080/project_name-0.0.1/ ``
+Now the url of the server has change to: `` localhost:8080/project_name-0.0.1/ ``
