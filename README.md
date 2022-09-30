@@ -20,3 +20,8 @@ Right click on the project (Project Folder window) 	→  Configure → Convert t
 
 Change version to 0.0.1 and click Finish.
 
+To see the change reflected we have to _Full Publish_ the project
+
+- (_Server window_)Right click on the project → Full publish
+
+Now the link of the server has change to: `` localhost:8080/project_name-0.0.1/ ``
