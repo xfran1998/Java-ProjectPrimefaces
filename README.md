@@ -1,1 +1,1 @@
-Testing primefaces and managed beans
+# Creating a Primefaces project and testing
