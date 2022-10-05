@@ -6,6 +6,31 @@
   <packaging>war</packaging>
   <name>Java-Primefaces</name>
   <description>Java primefaces project</description>
+    <dependencies>
+    	<dependency>
+            <groupId>javax</groupId>
+            <artifactId>javaee-api</artifactId>
+            <version>8.0</version>
+            <scope>provided</scope>
+        </dependency>
+		<dependency>
+		    <groupId>org.slf4j</groupId>
+		    <artifactId>slf4j-api</artifactId>
+		    <version>1.7.36</version>
+		</dependency>
+		<dependency>
+			<groupId>org.primefaces</groupId>
+			<artifactId>primefaces</artifactId>
+			<version>7.0</version>
+		</dependency>
+
+		<dependency>
+    		<groupId>org.omnifaces</groupId>
+    		<artifactId>omnifaces</artifactId>
+    		<version>3.12</version>
+		</dependency>
+
+  </dependencies>
   <build>
     <plugins>
       <plugin>
