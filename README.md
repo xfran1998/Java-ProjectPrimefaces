@@ -1,13 +1,18 @@
-# Creating a Primefaces project and Managed Beans
+# Creando un projecto usando Primefaces
 
-We will be using:
+Usaremos:
 
-- JSPs
-- Servlets
-- JSFs
+- JSP
+- JSF
 - Primefaces
 - Beans
-- Mysql (database)
+- JPA
+- Hibernate
+- Mysql
+
+Estrutura.
+
+![img](https://i.imgur.com/Yp3UbJy.png)
 
 <br>
 <br>
@@ -15,31 +20,13 @@ We will be using:
 <br>
 <br>
 
-## Step 1: Create Dynamic Web Project
+## Paso 1: Crear un Dynamic Web Project
 
-The project have to start as a Dynamic Web Project, on next step we will convert it as Maven project.
+El proyecto tiene que empezar como un Dynamic Web Project, en el siguiente paso lo convertiremos a Maven.
 
-<br>
-<br>
-<hr>
-<br>
-<br>
-
-## Step 2: Converting to Maven
-
-```
-Right click on the project (Project Folder window) 	→  Configure → Convert to Maven project.
-```
-
-Change version to 0.0.1 and click Finish.
-
-To see the change reflected we have to _Full Publish_ the project
-
-```
-(Server window) Right click on the project → Full publish
-```
-
-Now the url of the server has change to: `` localhost:8080/project_name-0.0.1/ ``
+Al crear el proyecto hay que tener en cuenta 2 cosas:
+- El nombre del proyecto sera **Java-Primefaces**
+- En la última pestaña de la configuración hay que marcar web.xml para que cree el archivo de forma automatica.
 
 <br>
 <br>
@@ -47,13 +34,35 @@ Now the url of the server has change to: `` localhost:8080/project_name-0.0.1/ `
 <br>
 <br>
 
-## Step 3: Install dependencies
+## Paso 2: Convertiendo a Maven
 
-We need to add the depencies to the pom.xml file situated on the root of the project
+```
+(Project window) **Java-Primefaces** → Configure → Convert to Maven project.
+```
 
-### Adding to pom.xml
+Cambia la version a 0.0.1 y finalizar.
 
-Add this lines to pom.xml above **build** tag
+Para ver los cambios reflejados tenemeos que hacer un _Full publish_ al proyecto.
+
+```
+(Server window) **Java-Primefaces** → Full publish
+```
+
+Ahora la url para acceder a la web a cambiado a: `` localhost:8080/Java-Primefaces-0.0.1/ ``
+
+<br>
+<br>
+<hr>
+<br>
+<br>
+
+## Paso 3: Installar dependencias
+
+Necesitamos añadir las depencias que vamos a usar en el proyecto para que Maven las pueda descargar e installar, para ello vamos a añadirlas a **pom.xml** situado en el root del proyecto.
+
+### Añadiendo depencias a pom.xml
+
+Vamos a añadir las depencias de primefaces, omnifaces y slf4j (logs), para ello hay que poner las siguientes lineas encima del tag ``<build>``.
 
 ```xml
 <dependencies>
@@ -81,9 +90,10 @@ Add this lines to pom.xml above **build** tag
 </dependencies>
   ```
 
-this will install Primefaces and a simple loggin library
+Esto debería instalar Primefaces para poder testear que todo esta funcionando.
 
-Complete pom.xml:
+pom.xml completo:
+
 ```xml
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
@@ -136,18 +146,18 @@ Complete pom.xml:
 </project>
 ```
 
-### Installing dependecies
+### Instalando dependencias
 
-When it's all set up we need to install the depencies to the project, for that:
+Vamos a instalar las depencias que hemos añadido al pom.xml, para ello:
 
 ```
-Right click on the project name → Run As → Maven Clean
-Right click on the project name → Run As → Maven Install
+(Project window) **Java-Primefaces** → Run As → Maven Clean
+(Project window) **Java-Primefaces** → Run As → Maven Install
 ```
 
-That will install and build all the packages we need.
+Con esto se instalarán y compilarán los paquetes que necesitamos.
 
-If the build fail check the version of the java you are using (need java 1.8)
+Si tienes un fallo en la compilación revisa la versión de Java que usa el projecto y Eclipse.
 
 <br>
 <br>
@@ -155,13 +165,13 @@ If the build fail check the version of the java you are using (need java 1.8)
 <br>
 <br>
 
-## Step 4: Create a simple JSF to test it's all working
+## Paso 4: Creando un JSF simple
 
-Create a index.xhtml on webapp folder
+Creamos un index.xhtml en la carpeta de webapp
 
-(If u don't have the option u can just create a file and name it like index.xhtml)
+(Si no te sale la opción de crear un xhtml puedes crear un archivo (file) y ponerle de nombre de index.xhtml)
 
-To test is working we will be using the hello world example on Primefaces
+Para comprobar que está funcionando vamos a crear un xhtml demo usando Primefaces
 
 ```xhtml
 <!DOCTYPE html>
@@ -184,7 +194,26 @@ To test is working we will be using the hello world example on Primefaces
 </html>
 ```
 
-We should see a text editor at ``http://localhost:8080/Java-Primefaces-0.0.1/index.xhtml``
+Deberíamos ver un editor en ``http://localhost:8080/Java-Primefaces-0.0.1/index.xhtml``
+
+Nota: Si quiere hacer que se acceda directamente desde el root (/Java-Primefaces-0.0.1/) entonces debes añadir index.xhtml al Welcome del archivo web.xml que hemos creado en el paso 1.
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://xmlns.jcp.org/xml/ns/javaee" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd" id="WebApp_ID" version="4.0">
+  <display-name>Java-Primefaces</display-name>
+  <welcome-file-list>
+    <welcome-file>index.html</welcome-file>
+    <welcome-file>index.xhtml</welcome-file>
+    <welcome-file>index.jsp</welcome-file>
+    <welcome-file>index.htm</welcome-file>
+    <welcome-file>default.html</welcome-file>
+    <welcome-file>default.jsp</welcome-file>
+    <welcome-file>default.htm</welcome-file>
+  </welcome-file-list>
+</web-app>
+```
+<br>
 
 ![img](https://i.imgur.com/Wrpz31d.png)
 <br>
@@ -193,21 +222,31 @@ We should see a text editor at ``http://localhost:8080/Java-Primefaces-0.0.1/ind
 <br>
 <br>
 
-## Step 5: Create a simple bean we can use on the JSF
+## Paso 5: Creando un bean simple para usarlo en la JSF
 
-We will be creating a package it's all wrapped called Tutorial
+Vamos a crear un package para juntar todos las clases llamado Tutorial.
 
 ```
-Right java package → new → create other → package
+(Project window) **Java-Primefaces** → new → create other → package
 ```
 
-Inside Tutorial package we will have a **bean** and **service** folder and the project structure at the end of this step will be like:
+Dentro de Tutorial vamos a tener una carpeta **bean** y un **service**, vamos a tener esta estructura al final de este paso.
 
 ![img](https://i.imgur.com/kVjold7.png)
 
-### Creating the bean
+### Creando el bean
 
-We need to create a
+Para crear el bean vamos a crear una clase llamada MyBean por ejemplo que se accederá desde la JSF
+
+```java
+@Named("dtBasicView")
+@ViewScoped
+public class MyBean implements Serializable {
+
+}
+```
+
+Resultado final:
 
 ```java
 package Tutorial.bean;
