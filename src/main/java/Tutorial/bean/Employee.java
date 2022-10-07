@@ -5,10 +5,22 @@ public class Employee {
 	private String firstName;
 	private String lastName;
 	
+	public Employee() {
+		id = -1;
+		firstName = "";
+		lastName = "";
+	}
+	
 	public Employee(int id, String firstName, String lastName) {
 		this.id = id;
 		this.firstName = firstName;
 		this.lastName = lastName;
+	}
+
+	public Employee(Employee e) {
+		this.id = e.id;
+		this.firstName = e.firstName;
+		this.lastName = e.lastName;
 	}
 	
 	public int getId() {

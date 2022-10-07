@@ -75,7 +75,8 @@ public class EmployeeService {
         return Arrays.asList(lastName);
     }
     
-    public void addEmployee(String fistName, String lastName) {
-    	employees.add(new Employee(getRandomId(), fistName, lastName));
+    public void addEmployee(Employee emp) {
+    	emp.setId(getRandomId());
+    	employees.add(emp);
     }
 }

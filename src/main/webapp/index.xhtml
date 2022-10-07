@@ -24,14 +24,16 @@
 			        <h:outputText value="#{employee.lastName}" />
 			    </p:column>
 			</p:dataTable>
+			<br />
+			<br />
+			<br />
 			<h:form>
-				<h3>Floating Label</h3>
 			   <span class="ui-float-label">
-			       <p:inputText id="float-input-firstName" value="#{dtBasicView.firstName}" />
+			       <p:inputText id="float-input-firstName" value="#{dtBasicView.emp.firstName}" />
 			       <p:outputLabel for="@previous" value="fistName" />
 			   </span>
 			   <span class="ui-float-label">
-			       <p:inputText id="float-input-lastName" value="#{dtBasicView.lastName}" />
+			       <p:inputText id="float-input-lastName" value="#{dtBasicView.emp.lastName}" />
 			       <p:outputLabel for="@previous" value="lastName" />
 			   </span>
 			   <p:commandButton value="Run" icon="pi pi-star" action="#{dtBasicView.addEmployee()}" update=":employee-table"></p:commandButton>

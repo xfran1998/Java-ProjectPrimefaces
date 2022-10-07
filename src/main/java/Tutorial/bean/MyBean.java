@@ -18,8 +18,7 @@ import Tutorial.service.EmployeeService;
 public class MyBean implements Serializable {
      
     private List<Employee> employees;
-    private String firstName;
-    private String lastName;
+    private Employee emp;
      
     @Inject
     private EmployeeService service;
@@ -27,6 +26,7 @@ public class MyBean implements Serializable {
     @PostConstruct
     public void init() {
     	employees = service.getEmployees();
+    	emp = new Employee();
     }
      
     public List<String> getFirstNames() {
@@ -46,25 +46,15 @@ public class MyBean implements Serializable {
         this.service = service;
     }
 
-	public String getFirstName() {
-		return firstName;
-	}
+    public Employee getEmp() {
+        return emp;
+    }
 
-	public void setFirstName(String firstName) {
-		this.firstName = firstName;
-	}
-
-	public String getLastName() {
-		return lastName;
-	}
-
-	public void setLastName(String lastName) {
-		this.lastName = lastName;
-	}
+    public void setEmp(Employee emp) {
+        this.emp = emp;
+    }
 	
-	public void addEmployee() {
-		//System.out.println("[TEST]");
-		System.out.println("[" + firstName + "," + lastName + "]");
-		service.addEmployee(firstName, lastName);
+	public void addEmployee() {		
+		service.addEmployee(new Employee(emp));
 	}
 }
