@@ -571,6 +571,11 @@ Ya tenemos todo el sistema montado pero falta mostrarselo al usuario, para ello 
 
 Con esto debería ser suficiente para ver aparecer una tabla con los datos de los empleados y poder añadir más a traves del formulario
 
+<br>
+<br>
+<hr>
+<br>
+<br>
 ## Paso 6: Connectarse a la BBDD
 
 Para la base de datos vamos a usar Maria-DB, dependiendo del ORM que uses permitirá unas bases de datos u otras y puede que la configuración cambie.
@@ -594,9 +599,17 @@ Lo primero que necesitamos hacer es añadir las dependencias.
 
 Una vez añadidas hay que hacer un Maven Clean y Maven Install (Paso 3)
 
+<br>
+<br>
+<hr>
+<br>
+<br>
+
 ## Paso 7: Creando el DAO de myBean
 
 Necesitamos una clase que pueda controlar la JPA, para ello vamos a crear una carpeta dao dentro del paquete Tutorial al igual que bean y service, la llamaremos myBeanDAO
+
+![img](https://i.imgur.com/bGrRcPB.png)
 
 ```java
 package Tutorial.dao;
@@ -665,9 +678,15 @@ public static List<Employee> findAll() {
 }
 ```
 
-### Paso 8: Creando elXML
+<br>
+<br>
+<hr>
+<br>
+<br>
 
-Creamos un archivo de configuración para hibernate, se tendrá que situar dentro del paquete **java**, justo al mismo nivel que Tutorial.
+## Paso 8: Creando elXML
+
+Creamos un archivo de configuración para hibernate, se tendrá que situar dentro del paquete **java**, justo al mismo nivel que Tutorial, puedes consultar en la imagen del paso anterior.
 
 ```xml
 <!DOCTYPE hibernate-configuration PUBLIC
@@ -695,12 +714,18 @@ Creamos un archivo de configuración para hibernate, se tendrá que situar dentr
         <property name="hibernate.dbcp.maxTotal">20</property>
         <property name="hibernate.dbcp.maxIdle">10</property>
         <property name="hibernate.dbcp.minIdle">5</property>
-        <property name="hibernate.dbcp.maxWaitMillis">-1</property> 
+        <property name="hibernate.dbcp.maxWaitMillis">-1</property>
     </session-factory>
 </hibernate-configuration>
 ```
 
 Solo hay que cambiar las credenciales de url, username y password para adaptarlo a la BBDD en caso de ser un sql.
+
+<br>
+<br>
+<hr>
+<br>
+<br>
 
 ## Paso 9: Adaptar el projecto
 
@@ -726,20 +751,20 @@ public class Employee {
 	@Column(name = "id")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
-	
+
 	@Column(name = "firstName")
 	private String firstName;
-	
+
 	@Column(name = "lastName")
 	private String lastName;
-	
-	
+
+
 	public Employee() {
 		id = -1;
 		firstName = "";
 		lastName = "";
 	}
-	
+
 	public Employee(int id, String firstName, String lastName) {
 		this.id = id;
 		this.firstName = firstName;
@@ -751,7 +776,7 @@ public class Employee {
 		this.firstName = e.firstName;
 		this.lastName = e.lastName;
 	}
-	
+
 	public int getId() {
 		return id;
 	}
@@ -775,7 +800,7 @@ public class Employee {
 	public void setLastName(String lastName) {
 		this.lastName = lastName;
 	}
-	
+
 	public String toString() {
 		return "[ " + id + " ]: " + firstName + ", " + lastName;
 	}
@@ -803,33 +828,33 @@ import Tutorial.service.EmployeeService;
 @Named("dtBasicView")
 @ViewScoped
 public class MyBean implements Serializable {
-     
+
     private List<Employee> employees;
     private Employee emp;
-     
+
     @Inject
     private EmployeeService service;
- 
+
     @PostConstruct
     public void init() {
         service.updateEmployees();
     	employees = service.getEmployees();
     	emp = new Employee();
     }
-     
+
     public List<String> getFirstNames() {
         return employees.stream().map(Employee::getFirstName).collect(Collectors.toList());
     }
-    
-    
+
+
    public List<String> getLastNames() {
        return employees.stream().map(Employee::getLastName).collect(Collectors.toList());
    }
-   
+
    public List<Employee> getEmployees(){
         return service.updateEmployees();
    }
-   
+
     public void setService(EmployeeService service) {
         this.service = service;
     }
@@ -841,8 +866,8 @@ public class MyBean implements Serializable {
     public void setEmp(Employee emp) {
         this.emp = emp;
     }
-	
-	public void addEmployee() {		
+
+	public void addEmployee() {
 		service.addEmployee(new Employee(emp));
 		System.out.println("Add user");
 	}
@@ -872,17 +897,17 @@ import Tutorial.dao.myBeanDAO;
 @ApplicationScoped
 public class EmployeeService {
     private static List<Employee> employees;
-     
+
 
     public EmployeeService() {
     	// create random list of employees
-    	updateEmployees();   
+    	updateEmployees();
     }
-     
+
     public List<Employee> getEmployees() {
-    	return employees;       
+    	return employees;
     }
-     
+
     public List<Employee> updateEmployees() {
     	System.out.println("Update user");
     	employees = myBeanDAO.findAll();
@@ -898,51 +923,63 @@ public class EmployeeService {
 ```
 
 ### Modificando index.xhtml
+
 ```xhtml
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:h="http://xmlns.jcp.org/jsf/html"
-      xmlns:f="http://xmlns.jcp.org/jsf/core"
-      xmlns:jsf="http://xmlns.jcp.org/jsf"
-      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
-      xmlns:p="http://primefaces.org/ui">
+<html
+  xmlns="http://www.w3.org/1999/xhtml"
+  xmlns:h="http://xmlns.jcp.org/jsf/html"
+  xmlns:f="http://xmlns.jcp.org/jsf/core"
+  xmlns:jsf="http://xmlns.jcp.org/jsf"
+  xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+  xmlns:p="http://primefaces.org/ui"
+>
+  <f:view contentType="text/html;charset=UTF-8" encoding="UTF-8">
+    <h:head> </h:head>
+    <h:body>
+      <p:dataTable
+        id="employee-table"
+        var="employee"
+        value="#{dtBasicView.employees}"
+      >
+        <p:column headerText="Id">
+          <h:outputText value="#{employee.id}" />
+        </p:column>
 
-    <f:view contentType="text/html;charset=UTF-8" encoding="UTF-8">
-        <h:head>
+        <p:column headerText="FirstName">
+          <h:outputText value="#{employee.firstName}" />
+        </p:column>
 
-        </h:head>
-        <h:body>
-            <p:dataTable id="employee-table" var="employee" value="#{dtBasicView.employees}">
-			    <p:column headerText="Id">
-			        <h:outputText value="#{employee.id}" />
-			    </p:column>
-			 
-			    <p:column headerText="FirstName">
-			        <h:outputText value="#{employee.firstName}" />
-			    </p:column>
-			 
-			    <p:column headerText="LastName">
-			        <h:outputText value="#{employee.lastName}" />
-			    </p:column>
-			</p:dataTable>
-			<br />
-			<br />
-			<br />
-			<h:form>
-			   <span class="ui-float-label">
-			       <p:inputText id="float-input-firstName" value="#{dtBasicView.emp.firstName}" />
-			       <p:outputLabel for="@previous" value="fistName" />
-			   </span>
-			   <span class="ui-float-label">
-			       <p:inputText id="float-input-lastName" value="#{dtBasicView.emp.lastName}" />
-			       <p:outputLabel for="@previous" value="lastName" />
-			   </span>
-			   <p:commandButton value="Run" icon="pi pi-star" action="#{dtBasicView.addEmployee()}" update="employee-table"></p:commandButton>
-		   </h:form>
-        </h:body>
-    </f:view>
-
+        <p:column headerText="LastName">
+          <h:outputText value="#{employee.lastName}" />
+        </p:column>
+      </p:dataTable>
+      <br />
+      <br />
+      <br />
+      <h:form>
+        <span class="ui-float-label">
+          <p:inputText
+            id="float-input-firstName"
+            value="#{dtBasicView.emp.firstName}"
+          />
+          <p:outputLabel for="@previous" value="fistName" />
+        </span>
+        <span class="ui-float-label">
+          <p:inputText
+            id="float-input-lastName"
+            value="#{dtBasicView.emp.lastName}"
+          />
+          <p:outputLabel for="@previous" value="lastName" />
+        </span>
+        <p:commandButton
+          value="Run"
+          icon="pi pi-star"
+          action="#{dtBasicView.addEmployee()}"
+          update="employee-table"
+        ></p:commandButton>
+      </h:form>
+    </h:body>
+  </f:view>
 </html>
 ```
-
-
