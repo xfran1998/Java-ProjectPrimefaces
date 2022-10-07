@@ -36,7 +36,7 @@
 			       <p:inputText id="float-input-lastName" value="#{dtBasicView.emp.lastName}" />
 			       <p:outputLabel for="@previous" value="lastName" />
 			   </span>
-			   <p:commandButton value="Run" icon="pi pi-star" action="#{dtBasicView.addEmployee()}" update=":employee-table"></p:commandButton>
+			   <p:commandButton value="Run" icon="pi pi-star" action="#{dtBasicView.addEmployee()}" update="employee-table"></p:commandButton>
 		   </h:form>
         </h:body>
     </f:view>

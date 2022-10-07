@@ -25,6 +25,7 @@ public class MyBean implements Serializable {
  
     @PostConstruct
     public void init() {
+        service.updateEmployees();
     	employees = service.getEmployees();
     	emp = new Employee();
     }
@@ -39,7 +40,7 @@ public class MyBean implements Serializable {
    }
    
    public List<Employee> getEmployees(){
-	   return employees;
+        return service.updateEmployees();
    }
    
     public void setService(EmployeeService service) {
@@ -56,5 +57,10 @@ public class MyBean implements Serializable {
 	
 	public void addEmployee() {		
 		service.addEmployee(new Employee(emp));
+		System.out.println("Add user");
 	}
+
+    public void updateEmployees() {
+    	employees = service.updateEmployees();
+    }
 }

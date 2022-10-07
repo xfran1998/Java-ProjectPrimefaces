@@ -455,7 +455,7 @@ public class Employee {
 }
 ```
 
-Para los metodos vamos a necesitar los constructores, los seters y los getters 
+Para los metodos vamos a necesitar los constructores, los seters y los getters
 
 ```java
 public Employee() {
@@ -511,6 +511,395 @@ Ya tenemos todo el sistema montado pero falta mostrarselo al usuario, para ello 
 
 ```xhtml
 <!DOCTYPE html>
+<html
+  xmlns="http://www.w3.org/1999/xhtml"
+  xmlns:h="http://xmlns.jcp.org/jsf/html"
+  xmlns:f="http://xmlns.jcp.org/jsf/core"
+  xmlns:jsf="http://xmlns.jcp.org/jsf"
+  xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+  xmlns:p="http://primefaces.org/ui"
+>
+  <f:view contentType="text/html;charset=UTF-8" encoding="UTF-8">
+    <h:head> </h:head>
+    <h:body>
+      <p:dataTable
+        id="employee-table"
+        var="employee"
+        value="#{dtBasicView.employees}"
+      >
+        <p:column headerText="Id">
+          <h:outputText value="#{employee.id}" />
+        </p:column>
+
+        <p:column headerText="FirstName">
+          <h:outputText value="#{employee.firstName}" />
+        </p:column>
+
+        <p:column headerText="LastName">
+          <h:outputText value="#{employee.lastName}" />
+        </p:column>
+      </p:dataTable>
+      <br />
+      <br />
+      <br />
+      <h:form>
+        <span class="ui-float-label">
+          <p:inputText
+            id="float-input-firstName"
+            value="#{dtBasicView.emp.firstName}"
+          />
+          <p:outputLabel for="@previous" value="fistName" />
+        </span>
+        <span class="ui-float-label">
+          <p:inputText
+            id="float-input-lastName"
+            value="#{dtBasicView.emp.lastName}"
+          />
+          <p:outputLabel for="@previous" value="lastName" />
+        </span>
+        <p:commandButton
+          value="Run"
+          icon="pi pi-star"
+          action="#{dtBasicView.addEmployee()}"
+          update=":employee-table"
+        ></p:commandButton>
+      </h:form>
+    </h:body>
+  </f:view>
+</html>
+```
+
+Con esto debería ser suficiente para ver aparecer una tabla con los datos de los empleados y poder añadir más a traves del formulario
+
+## Paso 6: Connectarse a la BBDD
+
+Para la base de datos vamos a usar Maria-DB, dependiendo del ORM que uses permitirá unas bases de datos u otras y puede que la configuración cambie.
+
+Para la JPA vamos a usar hibernate.
+
+Lo primero que necesitamos hacer es añadir las dependencias.
+
+```xml
+<dependency>
+    <groupId>mysql</groupId>
+    <artifactId>mysql-connector-java</artifactId>
+    <version>8.0.28</version>
+</dependency>
+<dependency>
+    <groupId>org.hibernate</groupId>
+    <artifactId>hibernate-core</artifactId>
+    <version>5.6.10.Final</version>
+</dependency>
+```
+
+Una vez añadidas hay que hacer un Maven Clean y Maven Install (Paso 3)
+
+## Paso 7: Creando el DAO de myBean
+
+Necesitamos una clase que pueda controlar la JPA, para ello vamos a crear una carpeta dao dentro del paquete Tutorial al igual que bean y service, la llamaremos myBeanDAO
+
+```java
+package Tutorial.dao;
+
+import java.util.List;
+
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.cfg.Configuration;
+
+import Tutorial.bean.Employee;
+
+public class myBeanDAO {
+	private static SessionFactory session;
+}
+```
+
+La clase contiene un SessionFactory estático que se va a encargar de manejar las sesiones del DAO.
+
+Implementamos la funcion _connect_ que nos va a permitir crear el SessionFactoty que a su vez se encargará de crear conexiones (sesiones) a la BBDD
+
+```java
+private static void connect() {
+  if (session == null) {
+    Configuration configuration = new Configuration();
+    configuration.configure("hibernate.cfg.xml");
+    configuration.addAnnotatedClass(Employee.class);
+    session = configuration.buildSessionFactory();
+  }
+}
+```
+
+Añadimos los metodos para guardar empleados y coger empleados de la BBDD.
+
+```java
+public static void save(Employee e) {
+    connect();
+
+    Session s = session.openSession();
+    s.beginTransaction();
+    s.save(e);
+    s.getTransaction().commit();
+    s.close();
+}
+
+public static Employee find(int id) {
+    connect();
+
+    Session s = session.openSession();
+    s.beginTransaction();
+    Employee e = (Employee) s.get(Employee.class, id);
+    s.getTransaction().commit();
+    s.close();
+    return e;
+}
+
+public static List<Employee> findAll() {
+    connect();
+
+    Session s = session.openSession();
+    s.beginTransaction();
+    List<Employee> e = (List<Employee>) s.createQuery("from Employee").list();
+    s.getTransaction().commit();
+    s.close();
+    return e;
+}
+```
+
+### Paso 8: Creando elXML
+
+Creamos un archivo de configuración para hibernate, se tendrá que situar dentro del paquete **java**, justo al mismo nivel que Tutorial.
+
+```xml
+<!DOCTYPE hibernate-configuration PUBLIC
+        "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+<hibernate-configuration>
+    <session-factory>
+        <!-- JDBC Database connection settings -->
+        <property name="connection.driver_class">com.mysql.cj.jdbc.Driver</property>
+        <property name="connection.url">jdbc:mysql://localhost:3306/testjava</property>
+        <property name="connection.username">root</property>
+        <property name="connection.password">1234</property>
+        <!-- JDBC connection pool settings ... using built-in test pool -->
+        <property name="connection.pool_size">100</property>
+        <!-- Select our SQL dialect -->
+        <property name="dialect">org.hibernate.dialect.MySQL5Dialect</property>
+        <!-- Echo the SQL to stdout -->
+        <property name="show_sql">true</property>
+        <!-- Set the current session context -->
+        <property name="current_session_context_class">thread</property>
+        <!-- Drop and re-create the database schema on startup -->
+        <!-- <property name="hbm2ddl.auto">create-drop</property> -->
+        <!-- dbcp connection pool configuration -->
+        <property name="hibernate.dbcp.initialSize">5</property>
+        <property name="hibernate.dbcp.maxTotal">20</property>
+        <property name="hibernate.dbcp.maxIdle">10</property>
+        <property name="hibernate.dbcp.minIdle">5</property>
+        <property name="hibernate.dbcp.maxWaitMillis">-1</property> 
+    </session-factory>
+</hibernate-configuration>
+```
+
+Solo hay que cambiar las credenciales de url, username y password para adaptarlo a la BBDD en caso de ser un sql.
+
+## Paso 9: Adaptar el projecto
+
+Al comprobar que funcionaban parte de la aplicación sin tenerla acabada, ahora hay que retocar los archivos para adaptarlos a la nueva situación.
+
+### Modificando Employee
+
+```java
+package Tutorial.bean;
+
+// Importing required classes
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+@Entity
+@Table(name = "employee")
+public class Employee {
+	@Id
+	@Column(name = "id")
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private int id;
+	
+	@Column(name = "firstName")
+	private String firstName;
+	
+	@Column(name = "lastName")
+	private String lastName;
+	
+	
+	public Employee() {
+		id = -1;
+		firstName = "";
+		lastName = "";
+	}
+	
+	public Employee(int id, String firstName, String lastName) {
+		this.id = id;
+		this.firstName = firstName;
+		this.lastName = lastName;
+	}
+
+	public Employee(Employee e) {
+		this.id = e.id;
+		this.firstName = e.firstName;
+		this.lastName = e.lastName;
+	}
+	
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	public String getFirstName() {
+		return firstName;
+	}
+
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
+	}
+
+	public String getLastName() {
+		return lastName;
+	}
+
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
+	}
+	
+	public String toString() {
+		return "[ " + id + " ]: " + firstName + ", " + lastName;
+	}
+}
+```
+
+### Modificando MyBean
+
+```java
+package Tutorial.bean;
+
+import java.io.Serializable;
+import java.util.List;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
+
+import javax.annotation.PostConstruct;
+import javax.enterprise.context.ConversationScoped;
+import javax.faces.view.ViewScoped;
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import Tutorial.service.EmployeeService;
+
+@Named("dtBasicView")
+@ViewScoped
+public class MyBean implements Serializable {
+     
+    private List<Employee> employees;
+    private Employee emp;
+     
+    @Inject
+    private EmployeeService service;
+ 
+    @PostConstruct
+    public void init() {
+        service.updateEmployees();
+    	employees = service.getEmployees();
+    	emp = new Employee();
+    }
+     
+    public List<String> getFirstNames() {
+        return employees.stream().map(Employee::getFirstName).collect(Collectors.toList());
+    }
+    
+    
+   public List<String> getLastNames() {
+       return employees.stream().map(Employee::getLastName).collect(Collectors.toList());
+   }
+   
+   public List<Employee> getEmployees(){
+        return service.updateEmployees();
+   }
+   
+    public void setService(EmployeeService service) {
+        this.service = service;
+    }
+
+    public Employee getEmp() {
+        return emp;
+    }
+
+    public void setEmp(Employee emp) {
+        this.emp = emp;
+    }
+	
+	public void addEmployee() {		
+		service.addEmployee(new Employee(emp));
+		System.out.println("Add user");
+	}
+
+    public void updateEmployees() {
+    	employees = service.updateEmployees();
+    }
+}
+```
+
+### Modificando EmployeeService
+
+```java
+package Tutorial.service;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Named;
+
+import Tutorial.bean.Employee;
+import Tutorial.dao.myBeanDAO;
+
+@Named
+@ApplicationScoped
+public class EmployeeService {
+    private static List<Employee> employees;
+     
+
+    public EmployeeService() {
+    	// create random list of employees
+    	updateEmployees();   
+    }
+     
+    public List<Employee> getEmployees() {
+    	return employees;       
+    }
+     
+    public List<Employee> updateEmployees() {
+    	System.out.println("Update user");
+    	employees = myBeanDAO.findAll();
+        return employees;
+    }
+
+    public void addEmployee(Employee emp) {
+        myBeanDAO.save(emp);
+    	/*emp.setId(getRandomId());
+    	employees.add(emp);*/
+    }
+}
+```
+
+### Modificando index.xhtml
+```xhtml
+<!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:f="http://xmlns.jcp.org/jsf/core"
@@ -548,7 +937,7 @@ Ya tenemos todo el sistema montado pero falta mostrarselo al usuario, para ello 
 			       <p:inputText id="float-input-lastName" value="#{dtBasicView.emp.lastName}" />
 			       <p:outputLabel for="@previous" value="lastName" />
 			   </span>
-			   <p:commandButton value="Run" icon="pi pi-star" action="#{dtBasicView.addEmployee()}" update=":employee-table"></p:commandButton>
+			   <p:commandButton value="Run" icon="pi pi-star" action="#{dtBasicView.addEmployee()}" update="employee-table"></p:commandButton>
 		   </h:form>
         </h:body>
     </f:view>
@@ -556,4 +945,4 @@ Ya tenemos todo el sistema montado pero falta mostrarselo al usuario, para ello 
 </html>
 ```
 
-Con esto debería ser suficiente para ver aparecer una tabla con los datos de los empleados y poder añadir más a traves del formulario
+
